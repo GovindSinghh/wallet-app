@@ -1,55 +1,74 @@
+'use client'
 import Image from "next/image";
+import { generateMnemonic } from "bip39";
+import {  useState } from "react";
+import generateKeysWithPhrase from "./[utils]/CreateWallet";
+import { AccountBox } from "./[components]/AccountBox";
 
 export default function Home() {
+
+  const [seedPhrase,setSeedPhrase]=useState<string | null>(null);
+  const [privateKey,setPrivateKey]=useState<string | null>(null);
+  const [publicKey,setPublicKey]=useState<string | null>(null);
+  const [accountNoFromInputSeed,setAccountNoFromInputSeed]=useState<number>(1);
+  const [accountNoFromCreatedSeed,setAccountNoFromCreatedSeed]=useState<number>(1);
+  const [phraseFromUser,setPhraseFromUser]=useState<string | null >(null);
+
+  let accounts=[];
+
+  function handleGenerate(){
+    if(!phraseFromUser){
+      let nextAccountNo = accountNoFromCreatedSeed;
+      let newSeedPhrase = seedPhrase;
+      let keypair;
+
+      if (!seedPhrase) {
+        newSeedPhrase = generateMnemonic(128);
+        keypair = generateKeysWithPhrase(newSeedPhrase, `m/44'/501'/1'`);
+      } else {
+        keypair = generateKeysWithPhrase(newSeedPhrase as string, `m/44'/501'/${nextAccountNo}'`);
+      }
+      setPrivateKey(keypair.privateKey);
+      setPublicKey(keypair.publicKey);
+      setSeedPhrase(newSeedPhrase);
+      setAccountNoFromCreatedSeed(nextAccountNo + 1);
+      setAccountNoFromInputSeed(1);
+    }
+    else{
+      let nextAccountNo = accountNoFromInputSeed;
+      const trimmedPhrase = phraseFromUser.trim();
+      const keypair = generateKeysWithPhrase(trimmedPhrase, `m/44'/501'/${nextAccountNo}'`);
+      setPrivateKey(keypair.privateKey);
+      setPublicKey(keypair.publicKey);
+      setSeedPhrase(seedPhrase);
+      setAccountNoFromInputSeed(nextAccountNo + 1);
+      setAccountNoFromCreatedSeed(1);
+      setSeedPhrase(null);
+    }
+  }
+
+  function handleInputChange(e:any){
+    e.preventDefault();
+    const value=e.target.value;
+    setPhraseFromUser(value);
+  }
+
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
+        <input
+        type="text"
+        placeholder="Enter you seed phrase or Click generate to get new phrase"
+        className="w-[500px] rounded-lg text-white p-5 m-2 border-white"
+        onChange={(e)=>handleInputChange(e)}
         />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+        <button
+        className="p-4 rounded-xl border-1 border-white text-white hover:shadow-2xl cursor-pointer"
+        onClick={handleGenerate}> Generate key </button><br />
+
+        {(seedPhrase || phraseFromUser) && <div>seed phrase : {seedPhrase || phraseFromUser}</div>}
+        {(publicKey && privateKey) && <AccountBox accountNo={!phraseFromUser ? accountNoFromCreatedSeed-1 : accountNoFromInputSeed-1} publicKey={publicKey} privateKey={privateKey}/>}
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
         <a
