@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { generateMnemonic } from "bip39";
 import {  useState } from "react";
-import generateKeysWithPhrase from "./[utils]/CreateWallet";
+import { generateKeysWithPhrase }  from "./[utils]/methods";
 import { AccountBox } from "./[components]/AccountBox";
 
 export default function Home() {
@@ -58,7 +58,7 @@ export default function Home() {
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <input
         type="text"
-        placeholder="Enter you seed phrase or Click generate to get new phrase"
+        placeholder="Enter your seed phrase or Click generate to get new phrase"
         className="w-[500px] rounded-lg text-white p-5 m-2 border-white"
         onChange={(e)=>handleInputChange(e)}
         />
@@ -68,7 +68,7 @@ export default function Home() {
         onClick={handleGenerate}> Generate key </button><br />
 
         {(seedPhrase || phraseFromUser) && <div>seed phrase : {seedPhrase || phraseFromUser}</div>}
-        {(publicKey && privateKey) && <AccountBox accountNo={!phraseFromUser ? accountNoFromCreatedSeed-1 : accountNoFromInputSeed-1} publicKey={publicKey} privateKey={privateKey}/>}
+        {(publicKey && privateKey) && <AccountBox accountNo={!phraseFromUser ? accountNoFromCreatedSeed-1 : accountNoFromInputSeed-1} publicKey={publicKey} privateKey={privateKey} />}
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
         <a
