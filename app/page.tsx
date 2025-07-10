@@ -1,5 +1,4 @@
 'use client'
-import Image from "next/image";
 import { generateMnemonic } from "bip39";
 import {  useState } from "react";
 import { generateKeysWithPhrase }  from "./[utils]/methods";

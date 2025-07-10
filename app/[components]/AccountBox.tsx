@@ -1,5 +1,5 @@
 'use client'
-import { use, useState } from "react";
+import { useState } from "react";
 import { airDropSOL, getBalance, connection, sendTransaction } from "../[utils]/QueryBlockchain";
 import { ChevronDown, ChevronUp, Send } from "lucide-react";
 
