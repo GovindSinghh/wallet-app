@@ -1,14 +1,10 @@
 import { Connection,PublicKey,LAMPORTS_PER_SOL, SystemProgram, Transaction, sendAndConfirmTransaction, Signer } from "@solana/web3.js";
 import bs58 from "bs58";
 import "dotenv/config";
-const SOLANA_RPC_URL=process.env.NEXT_PUBLIC_SOLANA_RPC_URL;
+const SOLANA_RPC_URL=process.env.NEXT_PUBLIC_SOLANA_RPC_URL || "https://api.devnet.solana.com";
 
-const getConnectionObject=()=>{
-    if(SOLANA_RPC_URL){
-        const connection=new Connection(SOLANA_RPC_URL,"confirmed");
-        return connection;
-    }
-}
+
+const connection=new Connection(SOLANA_RPC_URL,"confirmed");
 
 const airDropSOL = async (connection: Connection, publicKeyString: string, amountInSOL: number = 1) => {
     let tries=3;
@@ -59,12 +55,13 @@ const sendTransaction=async(connection:Connection,fromPrivateKey:string,fromPubl
         transaction,
         [signer]
     );
+    const remainingBalance=await getBalance(connection,fromPublicKey);
 
-    return signature;
+    return { signature,remainingBalance};
 }
 
 export {
-    getConnectionObject,
+    connection,
     airDropSOL,
     getBalance,
     sendTransaction
