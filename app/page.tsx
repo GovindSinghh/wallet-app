@@ -59,6 +59,15 @@ export default function Home() {
     setPhraseFromUser(value);
   }
 
+  function handleDeleteWallet(){
+    wallets.pop();
+    if (accountNoFromCreatedSeed) {
+      setAccountNoFromCreatedSeed((prevNo) => prevNo - 1);
+    } else {
+      setAccountNoFromInputSeed((prevNo) => prevNo - 1);
+    }
+  }
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-black via-green-900 to-gray-900 bg-fixed flex flex-col items-center justify-center p-0 m-0" style={{background: 'linear-gradient(120deg, #0f2027 0%, #2c5364 100%)'}}>
       <main className="flex flex-col gap-[14px] row-start-2 items-center sm:items-start w-full max-w-2xl mt-16 bg-black/70 rounded-2xl shadow-2xl p-8 border border-green-800 backdrop-blur-md" style={{boxShadow: '0 0 40px #00ff00a0'}}>
@@ -75,10 +84,8 @@ export default function Home() {
           onClick={handleGenerate}>{accountData.publicKey ? "Add Wallet" :"Generate key"} </button><br />
 
           {
-          wallets.length > 0 && <button className="cursor-pointer" onClick={()=>{
-            wallets.pop();
-            accountNoFromCreatedSeed ? setAccountNoFromCreatedSeed((prevNo)=> prevNo-1) : setAccountNoFromInputSeed((prevNo)=> prevNo-1);
-            }}>{<Trash2 size={23}/>}
+          wallets.length > 0 && <button className="cursor-pointer" onClick={handleDeleteWallet}>
+            {<Trash2 size={23}/>}
             </button>
           }
 
