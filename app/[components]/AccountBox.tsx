@@ -45,7 +45,7 @@ const AccountBox=({accountData,setAccountData}:{
             },5000);
         }
     }
-    function handleReceiverAddress(e:any){
+    function handleReceiverAddress(e:React.ChangeEvent<HTMLInputElement>){
         e.preventDefault();
         const val=e.target.value;
         setReceiverPublicAddress(val);

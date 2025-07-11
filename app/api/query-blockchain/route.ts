@@ -91,7 +91,10 @@ export async function POST(req: NextRequest) {
             default:
                 return NextResponse.json({ error: "Invalid action" });
         }
-    } catch (error:any) {
-        return NextResponse.json({ error: error.message });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return NextResponse.json({ error: error.message });
+        }
+        return NextResponse.json({ error: "An unknown error occurred" });
     }
 }

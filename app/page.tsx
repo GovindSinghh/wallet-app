@@ -53,7 +53,7 @@ export default function Home() {
     setAccountData(newAccountData);
   }
 
-  function handleInputChange(e:any){
+  function handleInputChange(e:React.ChangeEvent<HTMLInputElement>){
     e.preventDefault();
     const value=e.target.value;
     setPhraseFromUser(value);
