@@ -1,10 +1,13 @@
 import { Connection,PublicKey,LAMPORTS_PER_SOL, SystemProgram, Transaction, sendAndConfirmTransaction, Signer } from "@solana/web3.js";
 import bs58 from "bs58";
 import "dotenv/config";
-const SOLANA_RPC_URL=process.env.NEXT_PUBLIC_SOLANA_RPC_URL || "https://api.devnet.solana.com";
+import { NextRequest, NextResponse } from "next/server";
+const SOLANA_RPC_URL=process.env.SOLANA_RPC_URL;
 
-
-const connection=new Connection(SOLANA_RPC_URL,"confirmed");
+let connection:Connection;
+if(SOLANA_RPC_URL){
+    connection=new Connection(SOLANA_RPC_URL,"confirmed");
+}
 
 const airDropSOL = async (connection: Connection, publicKeyString: string, amountInSOL: number = 1) => {
     let tries=3;
@@ -55,14 +58,40 @@ const sendTransaction=async(connection:Connection,fromPrivateKey:string,fromPubl
         transaction,
         [signer]
     );
-    const remainingBalance=await getBalance(connection,fromPublicKey);
 
-    return { signature,remainingBalance};
+    return signature;
 }
 
-export {
-    connection,
-    airDropSOL,
-    getBalance,
-    sendTransaction
-};
+// route handling
+export async function POST(req: NextRequest) {
+    const { action, ...params } = await req.json();
+
+    if (!connection) {
+        return NextResponse.json({ error: "No Solana connection" });
+    }
+
+    try {
+        let result;
+        switch (action) {
+            case "getBalance":
+                result = await getBalance(connection, params.publicKey);
+                return NextResponse.json({ balance: result });
+            case "airdrop":
+                result = await airDropSOL(connection, params.publicKey);
+                return NextResponse.json({ signature: result });
+            case "sendTransaction":
+                result = await sendTransaction(
+                    connection,
+                    params.fromPrivateKey,
+                    params.fromPublicKey,
+                    params.toPublicKey,
+                    params.amountInSOL
+                );
+                return NextResponse.json({ signature: result });
+            default:
+                return NextResponse.json({ error: "Invalid action" });
+        }
+    } catch (error:any) {
+        return NextResponse.json({ error: error.message });
+    }
+}
