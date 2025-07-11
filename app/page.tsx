@@ -3,7 +3,7 @@ import { generateMnemonic } from "bip39";
 import {  useState } from "react";
 import { generateKeysWithPhrase }  from "./[utils]/methods";
 import { AccountBox } from "./[components]/AccountBox";
-import { Github, Linkedin, Twitter } from "lucide-react";
+import { Github, Linkedin,Trash2, Twitter } from "lucide-react";
 interface UserAccountDataType{
   walletNo:number;
   publicKey: string | null;
@@ -69,9 +69,20 @@ export default function Home() {
         onChange={(e)=>handleInputChange(e)}
         />
 
-        <button
-        className="p-3 rounded-xl border-2 border-green-800 text-green-200 bg-black/80 hover:bg-green-800 hover:text-black hover:shadow-hacker transition-all duration-300 cursor-pointer tracking-widest shadow-md"
-        onClick={handleGenerate}>{accountData.publicKey ? "Add Wallet" :"Generate key"} </button><br />
+        <div className="flex w-full justify-between">
+          <button
+          className="p-3 rounded-xl border-2 border-green-800 text-green-200 bg-black/80 hover:bg-green-800 hover:text-black hover:shadow-hacker transition-all duration-300 cursor-pointer tracking-widest shadow-md"
+          onClick={handleGenerate}>{accountData.publicKey ? "Add Wallet" :"Generate key"} </button><br />
+
+          {
+          wallets.length > 0 && <button className="cursor-pointer" onClick={()=>{
+            wallets.pop();
+            accountNoFromCreatedSeed ? setAccountNoFromCreatedSeed((prevNo)=> prevNo-1) : setAccountNoFromInputSeed((prevNo)=> prevNo-1);
+            }}>{<Trash2 size={23}/>}
+            </button>
+          }
+
+        </div>
 
         {(seedPhrase || phraseFromUser) && <><span className="text-md text-gray-400">Seed Phrase</span>
           <pre className="break-all text-xs bg-gray-900 rounded-lg p-1 select-all cursor-pointer hover:bg-gray-700 transition-colors duration-200 overflow-hidden blur-xs hover:blur-none">{seedPhrase || phraseFromUser}</pre></>}
